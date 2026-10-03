@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WeatherConsoleClient.Applications.DTOs;
 using WeatherConsoleClient.Applications.Interfaces;
 
@@ -121,9 +119,12 @@ namespace WeatherConsoleClient.Presentation
             var choice =
                 Console.ReadLine();
 
-            return choice == "2"
-                ? "F"
-                : "C";
+            if (choice == "2")
+            {
+                return "F";
+            }
+
+            return "C";
         }
 
         private async Task ShowCurrentWeatherAsync(
@@ -213,6 +214,7 @@ namespace WeatherConsoleClient.Presentation
                 new ForecastDto
                 {
                     City = forecast.City,
+                    Count = filteredItems.Count,
                     Items = filteredItems
                 };
 
@@ -301,8 +303,11 @@ namespace WeatherConsoleClient.Presentation
                     .ToList();
             }
 
+            Console.WriteLine();
+
             Console.WriteLine(
-                "Invalid filter. Showing all forecast entries.");
+                "Invalid filter. " +
+                "Showing all forecast entries.");
 
             return items;
         }
@@ -325,6 +330,9 @@ namespace WeatherConsoleClient.Presentation
 
                 return;
             }
+
+            var unit =
+                SelectTemperatureUnit();
 
             var currentWeatherTask =
                 _weatherService
@@ -361,7 +369,8 @@ namespace WeatherConsoleClient.Presentation
                 _weatherFormatter
                     .FormatDashboard(
                         currentWeather,
-                        forecast));
+                        forecast,
+                        unit));
         }
     }
 }

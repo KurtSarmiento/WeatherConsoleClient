@@ -7,22 +7,9 @@ namespace WeatherConsoleClient.Presentation
     public class ConsoleWeatherFormatter : IWeatherFormatter
     {
         public string FormatCurrentWeather(
-            CurrentWeatherDto weather)
-        {
-            return FormatCurrentWeather(
-                weather,
-                "C");
-        }
-
-        public string FormatCurrentWeather(
             CurrentWeatherDto weather,
             string unit)
         {
-            var condition =
-                weather.Weather.Count > 0
-                    ? weather.Weather[0].Description
-                    : "Unknown";
-
             var temperature =
                 ConvertTemperature(
                     weather.Main.Temperature,
@@ -33,26 +20,35 @@ namespace WeatherConsoleClient.Presentation
                     weather.Main.FeelsLike,
                     unit);
 
+            var condition =
+                weather.Weather.Count > 0
+                    ? weather.Weather[0].Description
+                    : "Unknown";
+
             var builder =
                 new StringBuilder();
 
             builder.AppendLine();
+
             builder.AppendLine(
                 "========================================");
+
             builder.AppendLine(
                 "CURRENT WEATHER");
+
             builder.AppendLine(
                 "========================================");
+
             builder.AppendLine();
 
             builder.AppendLine(
                 $"City        : {weather.Name}");
 
             builder.AppendLine(
-                $"Temperature : {temperature:F1} °{unit}");
+                $"Temperature : {temperature:F2} °{unit}");
 
             builder.AppendLine(
-                $"Feels Like  : {feelsLike:F1} °{unit}");
+                $"Feels Like  : {feelsLike:F2} °{unit}");
 
             builder.AppendLine(
                 $"Condition   : {condition}");
@@ -64,17 +60,20 @@ namespace WeatherConsoleClient.Presentation
                 $"Pressure    : {weather.Main.Pressure} hPa");
 
             builder.AppendLine(
-                $"Wind Speed  : {weather.Wind.Speed:F1} m/s");
+                $"Wind Speed  : {weather.Wind.Speed:F2} m/s");
+
+            if (weather.Main.Temperature > 35)
+            {
+                builder.AppendLine();
+
+                builder.AppendLine(
+                    "WEATHER ALERT:");
+
+                builder.AppendLine(
+                    "High temperature detected.");
+            }
 
             return builder.ToString();
-        }
-
-        public string FormatForecast(
-            ForecastDto forecast)
-        {
-            return FormatForecast(
-                forecast,
-                "C");
         }
 
         public string FormatForecast(
@@ -85,12 +84,16 @@ namespace WeatherConsoleClient.Presentation
                 new StringBuilder();
 
             builder.AppendLine();
+
             builder.AppendLine(
                 "========================================");
+
             builder.AppendLine(
                 "5-DAY / 3-HOUR FORECAST");
+
             builder.AppendLine(
                 "========================================");
+
             builder.AppendLine();
 
             builder.AppendLine(
@@ -125,16 +128,16 @@ namespace WeatherConsoleClient.Presentation
                     $"{condition,-18}" +
                     $"{precipitation,5:F0}%");
 
-                // Rain Alert
                 if (precipitation >= 60)
                 {
                     builder.AppendLine(
                         "RAIN ALERT: High probability of precipitation.");
                 }
 
-                // Hot Weather Alert
                 if (item.Main.Temperature > 35)
                 {
+                    builder.AppendLine();
+
                     builder.AppendLine(
                         "WEATHER ALERT:");
 
@@ -152,24 +155,41 @@ namespace WeatherConsoleClient.Presentation
         {
             if (items.Count == 0)
             {
-                return string.Empty;
+                return
+                    "No forecast entries available for the selected date.";
             }
 
             var highestTemperature =
-                items.Max(item =>
-                    item.Main.Temperature);
+                items.Max(
+                    item => item.Main.Temperature);
 
             var lowestTemperature =
-                items.Min(item =>
-                    item.Main.Temperature);
+                items.Min(
+                    item => item.Main.Temperature);
 
             var averageTemperature =
-                items.Average(item =>
-                    item.Main.Temperature);
+                items.Average(
+                    item => item.Main.Temperature);
 
             var highestRainProbability =
-                items.Max(item =>
-                    item.ProbabilityOfPrecipitation * 100);
+                items.Max(
+                    item =>
+                        item.ProbabilityOfPrecipitation * 100);
+
+            var highest =
+                ConvertTemperature(
+                    highestTemperature,
+                    unit);
+
+            var lowest =
+                ConvertTemperature(
+                    lowestTemperature,
+                    unit);
+
+            var average =
+                ConvertTemperature(
+                    averageTemperature,
+                    unit);
 
             var builder =
                 new StringBuilder();
@@ -184,15 +204,15 @@ namespace WeatherConsoleClient.Presentation
 
             builder.AppendLine(
                 $"Highest Temperature : " +
-                $"{ConvertTemperature(highestTemperature, unit):F1} °{unit}");
+                $"{highest:F1} °{unit}");
 
             builder.AppendLine(
                 $"Lowest Temperature  : " +
-                $"{ConvertTemperature(lowestTemperature, unit):F1} °{unit}");
+                $"{lowest:F1} °{unit}");
 
             builder.AppendLine(
                 $"Average Temperature : " +
-                $"{ConvertTemperature(averageTemperature, unit):F1} °{unit}");
+                $"{average:F1} °{unit}");
 
             builder.AppendLine(
                 $"Highest Rain Chance : " +
@@ -203,8 +223,24 @@ namespace WeatherConsoleClient.Presentation
 
         public string FormatDashboard(
             CurrentWeatherDto currentWeather,
-            ForecastDto forecast)
+            ForecastDto forecast,
+            string unit)
         {
+            var currentTemperature =
+                ConvertTemperature(
+                    currentWeather.Main.Temperature,
+                    unit);
+
+            var currentFeelsLike =
+                ConvertTemperature(
+                    currentWeather.Main.FeelsLike,
+                    unit);
+
+            var currentCondition =
+                currentWeather.Weather.Count > 0
+                    ? currentWeather.Weather[0].Description
+                    : "Unknown";
+
             var builder =
                 new StringBuilder();
 
@@ -234,24 +270,41 @@ namespace WeatherConsoleClient.Presentation
 
             builder.AppendLine(
                 $"Temperature : " +
-                $"{currentWeather.Main.Temperature:F1} °C");
+                $"{currentTemperature:F1} °{unit}");
 
             builder.AppendLine(
                 $"Feels Like  : " +
-                $"{currentWeather.Main.FeelsLike:F1} °C");
+                $"{currentFeelsLike:F1} °{unit}");
+
+            builder.AppendLine(
+                $"Condition   : " +
+                $"{currentCondition}");
 
             builder.AppendLine(
                 $"Humidity    : " +
                 $"{currentWeather.Main.Humidity}%");
 
-            if (currentWeather.Weather.Count > 0)
+            builder.AppendLine(
+                $"Pressure    : " +
+                $"{currentWeather.Main.Pressure} hPa");
+
+            builder.AppendLine(
+                $"Wind Speed  : " +
+                $"{currentWeather.Wind.Speed:F1} m/s");
+
+            if (currentWeather.Main.Temperature > 35)
             {
+                builder.AppendLine();
+
                 builder.AppendLine(
-                    $"Condition   : " +
-                    $"{currentWeather.Weather[0].Description}");
+                    "WEATHER ALERT:");
+
+                builder.AppendLine(
+                    "High temperature detected.");
             }
 
             builder.AppendLine();
+
 
             builder.AppendLine(
                 "FORECAST");
@@ -261,6 +314,11 @@ namespace WeatherConsoleClient.Presentation
 
             foreach (var item in forecast.Items)
             {
+                var temperature =
+                    ConvertTemperature(
+                        item.Main.Temperature,
+                        unit);
+
                 var condition =
                     item.Weather.Count > 0
                         ? item.Weather[0].Description
@@ -271,9 +329,24 @@ namespace WeatherConsoleClient.Presentation
 
                 builder.AppendLine(
                     $"{item.DateTimeText,-20}" +
-                    $"{item.Main.Temperature,6:F1} °C   " +
+                    $"{temperature,6:F1} °{unit}   " +
                     $"{condition,-18}" +
                     $"{precipitation,4:F0}%");
+
+                if (precipitation >= 60)
+                {
+                    builder.AppendLine(
+                        "RAIN ALERT: High probability of precipitation.");
+                }
+
+                if (item.Main.Temperature > 35)
+                {
+                    builder.AppendLine(
+                        "WEATHER ALERT:");
+
+                    builder.AppendLine(
+                        "High temperature detected.");
+                }
             }
 
             return builder.ToString();

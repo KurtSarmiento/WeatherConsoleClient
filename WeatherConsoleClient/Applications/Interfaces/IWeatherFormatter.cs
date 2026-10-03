@@ -10,14 +10,8 @@ namespace WeatherConsoleClient.Applications.Interfaces
     public interface IWeatherFormatter
     {
         string FormatCurrentWeather(
-            CurrentWeatherDto weather);
-
-        string FormatCurrentWeather(
             CurrentWeatherDto weather,
             string unit);
-
-        string FormatForecast(
-            ForecastDto forecast);
 
         string FormatForecast(
             ForecastDto forecast,
@@ -29,6 +23,7 @@ namespace WeatherConsoleClient.Applications.Interfaces
 
         string FormatDashboard(
             CurrentWeatherDto currentWeather,
-            ForecastDto forecast);
+            ForecastDto forecast,
+            string unit);
     }
 }
