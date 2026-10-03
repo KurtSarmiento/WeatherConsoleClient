@@ -26,5 +26,9 @@ namespace WeatherConsoleClient.Applications.Interfaces
         string FormatForecastSummary(
             List<ForecastItemDto> items,
             string unit);
+
+        string FormatDashboard(
+            CurrentWeatherDto currentWeather,
+            ForecastDto forecast);
     }
 }

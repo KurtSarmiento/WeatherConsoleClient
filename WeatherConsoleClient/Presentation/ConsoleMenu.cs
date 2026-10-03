@@ -28,7 +28,8 @@ namespace WeatherConsoleClient.Presentation
             {
                 DisplayMenu();
 
-                var choice = Console.ReadLine();
+                var choice =
+                    Console.ReadLine();
 
                 switch (choice)
                 {
@@ -57,6 +58,7 @@ namespace WeatherConsoleClient.Presentation
                 }
 
                 Console.WriteLine();
+
                 Console.WriteLine(
                     "Press ENTER to continue...");
 
@@ -96,39 +98,44 @@ namespace WeatherConsoleClient.Presentation
             Console.Write(
                 "Enter your choice: ");
         }
+
         private static string SelectTemperatureUnit()
         {
             Console.WriteLine();
-            Console.WriteLine("TEMPERATURE UNIT");
-            Console.WriteLine("----------------------------------------");
-            Console.WriteLine("1. Celsius");
-            Console.WriteLine("2. Fahrenheit");
-            Console.Write("Enter your choice: ");
 
-            var choice = Console.ReadLine();
+            Console.WriteLine(
+                "TEMPERATURE UNIT");
 
-            return choice == "2" ? "F" : "C";
+            Console.WriteLine(
+                "----------------------------------------");
+
+            Console.WriteLine(
+                "1. Celsius");
+
+            Console.WriteLine(
+                "2. Fahrenheit");
+
+            Console.Write(
+                "Enter your choice: ");
+
+            var choice =
+                Console.ReadLine();
+
+            return choice == "2"
+                ? "F"
+                : "C";
         }
 
-        private static decimal ConvertTemperature(
-            decimal celsius,
-            string unit)
-        {
-            if (unit == "F")
-            {
-                return (celsius * 9 / 5) + 32;
-            }
-
-            return celsius;
-        }
         private async Task ShowCurrentWeatherAsync(
-    CancellationToken cancellationToken)
+            CancellationToken cancellationToken)
         {
             Console.WriteLine();
 
-            Console.Write("Enter city: ");
+            Console.Write(
+                "Enter city: ");
 
-            var city = Console.ReadLine();
+            var city =
+                Console.ReadLine();
 
             if (string.IsNullOrWhiteSpace(city))
             {
@@ -156,19 +163,22 @@ namespace WeatherConsoleClient.Presentation
             }
 
             Console.WriteLine(
-                _weatherFormatter.FormatCurrentWeather(
-                    weather,
-                    unit));
+                _weatherFormatter
+                    .FormatCurrentWeather(
+                        weather,
+                        unit));
         }
 
         private async Task ShowForecastAsync(
-    CancellationToken cancellationToken)
+            CancellationToken cancellationToken)
         {
             Console.WriteLine();
 
-            Console.Write("Enter city: ");
+            Console.Write(
+                "Enter city: ");
 
-            var city = Console.ReadLine();
+            var city =
+                Console.ReadLine();
 
             if (string.IsNullOrWhiteSpace(city))
             {
@@ -207,20 +217,24 @@ namespace WeatherConsoleClient.Presentation
                 };
 
             Console.WriteLine(
-                _weatherFormatter.FormatForecast(
-                    filteredForecast,
-                    unit));
+                _weatherFormatter
+                    .FormatForecast(
+                        filteredForecast,
+                        unit));
 
             Console.WriteLine(
-                _weatherFormatter.FormatForecastSummary(
-                    filteredItems,
-                    unit));
+                _weatherFormatter
+                    .FormatForecastSummary(
+                        filteredItems,
+                        unit));
         }
 
-        private static List<ForecastItemDto> SelectForecastFilter(
-            List<ForecastItemDto> items)
+        private static List<ForecastItemDto>
+            SelectForecastFilter(
+                List<ForecastItemDto> items)
         {
             Console.WriteLine();
+
             Console.WriteLine(
                 "FORECAST FILTER");
 
@@ -239,15 +253,19 @@ namespace WeatherConsoleClient.Presentation
             Console.Write(
                 "Enter your choice: ");
 
-            var choice = Console.ReadLine();
+            var choice =
+                Console.ReadLine();
 
             if (choice == "1")
             {
                 return items;
             }
 
-            var today = DateTime.Today;
-            var tomorrow = today.AddDays(1);
+            var today =
+                DateTime.Today;
+
+            var tomorrow =
+                today.AddDays(1);
 
             if (choice == "2")
             {
@@ -288,32 +306,37 @@ namespace WeatherConsoleClient.Presentation
 
             return items;
         }
-        
+
         private async Task ShowDashboardAsync(
             CancellationToken cancellationToken)
         {
             Console.WriteLine();
 
-            Console.Write("Enter city: ");
+            Console.Write(
+                "Enter city: ");
 
-            var city = Console.ReadLine();
+            var city =
+                Console.ReadLine();
 
             if (string.IsNullOrWhiteSpace(city))
             {
                 Console.WriteLine(
                     "City is required.");
+
                 return;
             }
 
             var currentWeatherTask =
-                _weatherService.GetCurrentWeatherAsync(
-                    city,
-                    cancellationToken);
+                _weatherService
+                    .GetCurrentWeatherAsync(
+                        city,
+                        cancellationToken);
 
             var forecastTask =
-                _weatherService.GetForecastAsync(
-                    city,
-                    cancellationToken);
+                _weatherService
+                    .GetForecastAsync(
+                        city,
+                        cancellationToken);
 
             await Task.WhenAll(
                 currentWeatherTask,
@@ -330,84 +353,15 @@ namespace WeatherConsoleClient.Presentation
             {
                 Console.WriteLine(
                     "Unable to retrieve weather information.");
+
                 return;
             }
 
-            DisplayDashboard(
-                currentWeather,
-                forecast);
-        }
-        private static void DisplayDashboard(
-            CurrentWeatherDto currentWeather,
-            ForecastDto forecast)
-        {
-            Console.WriteLine();
-
             Console.WriteLine(
-                "========================================");
-
-            Console.WriteLine(
-                "WEATHER DASHBOARD");
-
-            Console.WriteLine(
-                "========================================");
-
-            Console.WriteLine();
-
-            Console.WriteLine(
-                $"City: {currentWeather.Name}");
-
-            Console.WriteLine();
-
-            Console.WriteLine(
-                "CURRENT WEATHER");
-
-            Console.WriteLine(
-                "----------------------------------------");
-
-            Console.WriteLine(
-                $"Temperature : " +
-                $"{currentWeather.Main.Temperature:F1} °C");
-
-            Console.WriteLine(
-                $"Feels Like  : " +
-                $"{currentWeather.Main.FeelsLike:F1} °C");
-
-            Console.WriteLine(
-                $"Humidity    : " +
-                $"{currentWeather.Main.Humidity}%");
-
-            if (currentWeather.Weather.Count > 0)
-            {
-                Console.WriteLine(
-                    $"Condition   : " +
-                    $"{currentWeather.Weather[0].Description}");
-            }
-
-            Console.WriteLine();
-
-            Console.WriteLine(
-                "FORECAST");
-
-            Console.WriteLine(
-                "----------------------------------------");
-
-            foreach (var item in forecast.Items)
-            {
-                var condition =
-                    item.Weather.Count > 0
-                        ? item.Weather[0].Description
-                        : "Unknown";
-
-                var precipitation =
-                    item.ProbabilityOfPrecipitation * 100;
-
-                Console.WriteLine(
-                    $"{item.DateTimeText,-20}" +
-                    $"{item.Main.Temperature,6:F1} °C   " +
-                    $"{condition,-18}" +
-                    $"{precipitation,4:F0}%");
-            }
+                _weatherFormatter
+                    .FormatDashboard(
+                        currentWeather,
+                        forecast));
         }
     }
 }
